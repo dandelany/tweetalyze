@@ -51,11 +51,29 @@ def export_csv(filename):
     # open the file with csv writer
     csv_file = csv.writer(new_file)
     
+    # first row of csv is a list of the keys for all the data columns
     tweet_keys = recursive_list(db.tweets.find_one(), [], ['words', 'entities'], True)
+    entity_types = [['user_mentions','screen_name'], ['hashtags','text'], ['urls','expanded_url']]
+    for entity_type in entity_types:
+        tweet_keys.append(entity_type[0] + ' count')
+        tweet_keys.append(entity_type[0])
     csv_file.writerow([unicode(field).encode('ascii','ignore') for field in tweet_keys])
-    
+
     for tweet in db.tweets.find():
+        # get basic fields
         tweet_fields = recursive_list(tweet, [], ['words', 'entities'], False)
+        # get limited data about entities
+        for entity_type in entity_types:
+            # get count for each type of entity
+            entities = tweet['entities'][entity_type[0]]
+            tweet_fields.append(len(entities))
+            # and construct a stringified list of the entities' representative strings
+            entity_strings = []
+            for entity in entities:
+                entity_strings.append(str(entity[entity_type[1]]))
+            joined_entities = ', '.join(entity_strings)
+            tweet_fields.append(joined_entities)
+
         csv_file.writerow([unicode(field).encode('ascii','ignore') for field in tweet_fields])
 
     new_file.close()

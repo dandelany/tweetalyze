@@ -59,7 +59,7 @@ def export_csv(filename):
         tweet_keys.append(entity_type[0])
     csv_file.writerow([unicode(field).encode('ascii','ignore') for field in tweet_keys])
 
-    for tweet in db.tweets.find():
+    for tweet in db.tweets.find().sort('author.screen_name', pymongo.ASCENDING):
         # get basic fields
         tweet_fields = recursive_list(tweet, [], ['words', 'entities'], False)
         # get limited data about entities
@@ -94,9 +94,3 @@ def recursive_list(data, list_so_far, keys_to_ignore, is_key_list):
         list_so_far.append(str(data))
 
     return list_so_far
-
-def testrl():
-    a = db.tweets.find_one()
-    pprint(a)
-    pprint(recursive_list(a, [], ['words', 'entities'], True)) 
-    pprint(recursive_list(a, [], ['words', 'entities'], False)) 

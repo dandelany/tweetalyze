@@ -65,6 +65,24 @@ def link_frequency():
             if link_count[1] > 1:
                 print link_count[1], link_count[0]
 
+def word_frequency():
+    boring_words = ['the','to','in','of','and','for','is','on','at','a','be','it','that','with','are','if','its','by']
+    for name in screen_names_in_db():
+        print "WORD FREQUENCY FOR", name
+        word_counts = {}
+        for tweet in db.tweets.find({'author.screen_name':name}):
+            for word in tweet['words']:
+                if word in boring_words: continue
+                if word in word_counts:
+                    word_counts[word] += 1
+                else:
+                    word_counts[word] = 1
+
+        # iterate through link counts dict, sorted by values
+        for word_counts in sorted(word_counts.iteritems(), key=operator.itemgetter(1), reverse=True):
+            if word_counts[1] > 10:
+                print word_counts[1], word_counts[0]
+
 def export_csv(filename):
     # make a new csv file with name of filename
     new_file = open(filename+'.csv','wb')
@@ -72,7 +90,7 @@ def export_csv(filename):
     csv_file = csv.writer(new_file)
     
     # first row of csv is a list of the keys for all the data columns
-    tweet_keys = recursive_list(db.tweets.find_one(), [], ['words', 'entities'], True)
+    tweet_keys = _recursive_list(db.tweets.find_one(), [], ['words', 'entities'], True)
     entity_types = [['user_mentions','screen_name'], ['hashtags','text'], ['urls','expanded_url']]
     for entity_type in entity_types:
         tweet_keys.append(entity_type[0] + ' count')
@@ -81,7 +99,7 @@ def export_csv(filename):
 
     for tweet in db.tweets.find().sort('author.screen_name', pymongo.ASCENDING):
         # get basic fields
-        tweet_fields = recursive_list(tweet, [], ['words', 'entities'], False)
+        tweet_fields = _recursive_list(tweet, [], ['words', 'entities'], False)
         # get limited data about entities
         for entity_type in entity_types:
             # get count for each type of entity
@@ -98,14 +116,14 @@ def export_csv(filename):
 
     new_file.close()
 
-def recursive_list(data, list_so_far, keys_to_ignore, is_key_list):
+def _recursive_list(data, list_so_far, keys_to_ignore, is_key_list):
     if type(data) is dict:
         for key, val in data.iteritems():
             if key in keys_to_ignore:
                 continue
             
             if type(val) is dict or type(val) is list:
-                recursive_list(val, list_so_far, keys_to_ignore, is_key_list)
+                _recursive_list(val, list_so_far, keys_to_ignore, is_key_list)
             else:
                 item = key if is_key_list else val
                 list_so_far.append(item)

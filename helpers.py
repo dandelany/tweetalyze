@@ -1,4 +1,4 @@
-import pymongo, csv
+import pymongo, csv, operator
 from datetime import datetime
 from pprint import pprint
 
@@ -11,6 +11,9 @@ except pymongo.errors.AutoReconnect:
     print "ERROR CONNECTING TO DATABASE! Is mongod running?"
 
 def screen_names_in_db():
+    """
+    Returns a list of all distinct Twitter screen names in the database
+    """
     return db.tweets.distinct('author.screen_name')
 
 def total_tweets():
@@ -31,7 +34,7 @@ def tweets_per_day():
 def tweets_with_word(word):
     # prints the number of tweets containing a given word for each screen name in database
     for name in screen_names_in_db():
-        print name, db.tweets.find({'words':word,'author.screen_name':name}).count()
+        print name, db.tweets.find({'words': word, 'author.screen_name': name}).count()
 
 def remove_all_tweets():
     confirm = raw_input("this will remove all tweets from your database, are you sure? (y/n): ")
@@ -42,8 +45,25 @@ def remove_all_tweets():
 
 def print_all_tweets():
     for name in screen_names_in_db():
-        for tweet in db.tweets.find({'author.screen_name':name}):
+        for tweet in db.tweets.find({'author.screen_name': name}):
             print name, tweet['text']
+
+def link_frequency():
+    for name in screen_names_in_db():
+        print "LINK FREQUENCY FOR", name
+        link_counts = {}
+        for tweet in db.tweets.find({'author.screen_name':name}):
+            for url in tweet['entities']['urls']:
+                expanded_url = url['expanded_url'].lower()
+                if expanded_url in link_counts:
+                    link_counts[expanded_url] += 1
+                else:
+                    link_counts[expanded_url] = 1
+
+        # iterate through link counts dict, sorted by values
+        for link_count in sorted(link_counts.iteritems(), key=operator.itemgetter(1), reverse=True):
+            if link_count[1] > 1:
+                print link_count[1], link_count[0]
 
 def export_csv(filename):
     # make a new csv file with name of filename

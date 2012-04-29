@@ -1,8 +1,14 @@
 import pymongo, csv
 from datetime import datetime
+from pprint import pprint
 
-connection = pymongo.Connection()
-db = connection.twitpol
+connection = False
+db = False
+try:
+    connection = pymongo.Connection()
+    db = connection.twitpol
+except pymongo.errors.AutoReconnect:
+    print "ERROR CONNECTING TO DATABASE! Is mongod running?"
 
 def screen_names_in_db():
     return db.tweets.distinct('author.screen_name')
@@ -42,10 +48,37 @@ def print_all_tweets():
 def export_csv(filename):
     # make a new csv file with name of filename
     new_file = open(filename+'.csv','wb')
-    new_file.close()
     # open the file with csv writer
-    csv_file = csv.writer(open(filename+'.csv', 'wb'))
+    csv_file = csv.writer(new_file)
+    
+    tweet_keys = recursive_list(db.tweets.find_one(), [], ['words', 'entities'], True)
+    csv_file.writerow([unicode(field).encode('ascii','ignore') for field in tweet_keys])
     
     for tweet in db.tweets.find():
-        csv_file.writerow([tweet['author']['screen_name'], tweet['text'].encode('ascii', 'replace')])
-    
+        tweet_fields = recursive_list(tweet, [], ['words', 'entities'], False)
+        csv_file.writerow([unicode(field).encode('ascii','ignore') for field in tweet_fields])
+
+    new_file.close()
+
+def recursive_list(data, list_so_far, keys_to_ignore, is_key_list):
+    if type(data) is dict:
+        for key, val in data.iteritems():
+            if key in keys_to_ignore:
+                continue
+            
+            if type(val) is dict or type(val) is list:
+                recursive_list(val, list_so_far, keys_to_ignore, is_key_list)
+            else:
+                item = key if is_key_list else val
+                list_so_far.append(item)
+
+    elif type(data) is list:
+        list_so_far.append(str(data))
+
+    return list_so_far
+
+def testrl():
+    a = db.tweets.find_one()
+    pprint(a)
+    pprint(recursive_list(a, [], ['words', 'entities'], True)) 
+    pprint(recursive_list(a, [], ['words', 'entities'], False)) 

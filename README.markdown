@@ -7,6 +7,7 @@ Dan Delany, Michelle Forelle, Sarah Sullivan
     * [Step-by-step Instructions](#step-by-step-instructions)
 3. [Helpers Module](#helpers-module)
 
+# Introduction
 TwitPolitics is a set of Python scripts for scraping tweets from the Twitter timelines of a set of given usernames. The intent behind their creation was to collect & analyze tweets sent by GOP Presidential candidates during the 2012 GOP primary campaign season, but the code could easily be adapted for other datasets and analyses.
 
 # Setup Instructions

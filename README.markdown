@@ -1,10 +1,16 @@
 # TwitPolitics
 Dan Delany, Michelle Forelle, Sarah Sullivan
+## Contents
+1. [Introduction](#introduction)
+2. [Setup Instructions](#setup-instructions)
+   a. [Basic Setup](#basic-setup)
+   b. [Step-by-step Instructions](#step-by-step-instructions)
+3. [Helpers Module](#helpers-module)
 
 TwitPolitics is a set of Python scripts for scraping tweets from the Twitter timelines of a set of given usernames. The intent behind their creation was to collect & analyze tweets sent by GOP Presidential candidates during the 2012 GOP primary campaign season, but the code could easily be adapted for other datasets and analyses.
 
 # Setup Instructions
-## Advanced Setup
+## Basic Setup
 The dependencies for TwitPolitics are Python 2.6-2.x, MongoDB (2.0.4), and Python libraries pymongo (2.1.1) and tweepy.
 
 We recommend using Homebrew to install MongoDB and pip to install pymongo and tweepy. Once dependencies are installed, start mongod and run the setup.py script, which will ensure everything is installed correctly by making a test call to the Twitter API, and inserting a tweet in a test collection.
@@ -45,7 +51,7 @@ Type "pip --version" and you should now see the version of pip you are running. 
 # Helpers Module
 ### export_csv(filename)
     Exports a CSV file containing nearly all known data about all tweets in the database.
-    
+
     Leaves out a few details about entities.
 
 ### link_frequency()

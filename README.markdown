@@ -40,3 +40,37 @@ Type "pip --version" and you should now see the version of pip you are running. 
     sudo pip install tweepy
 
 ### Running the setup script
+
+
+# Helpers Module
+### export_csv(filename)
+    Exports a CSV file containing nearly all known data about all tweets in the database.
+    
+    Leaves out a few details about entities.
+
+### link_frequency()
+    For each screen name in the database, prints a list of links in tweets, ordered by number of times tweeted.
+
+### print_all_tweets()
+    Prints the text of all tweets in the database.
+
+### remove_all_tweets()
+    Removes all tweets from the database. Cannot be undone.
+
+### screen_names_in_db()
+    Returns a list of all distinct Twitter screen names in the database.
+
+### total_tweets()
+    Prints the total number of tweets for each screen name in the database.
+
+### tweets_per_day()
+    Prints the average number of tweets per day for each screen name in database.
+
+### tweets_with_word(word)
+    Prints the number of tweets containing a given word or list of words for each screen name in database.
+
+### word_frequency()
+    For each screen name in the database, counts the frequency of words used and prints them in order of frequency.
+
+    By default, the following frequently occurring words are filtered out of this analysis:
+    ['the','to','in','of','and','for','is','on','at','a','be','it','that','this','with','are','if','its','by']

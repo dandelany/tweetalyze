@@ -12,18 +12,22 @@ except pymongo.errors.AutoReconnect:
 
 def screen_names_in_db():
     """
-    Returns a list of all distinct Twitter screen names in the database
+    Returns a list of all distinct Twitter screen names in the database.
     """
     return db.tweets.distinct('author.screen_name')
 
 def total_tweets():
-    # prints the total number of tweets for each screen name in the database
+    """
+    Prints the total number of tweets for each screen name in the database.
+    """
     print 'total tweets:', db.tweets.count()
     for name in screen_names_in_db():
         print name, db.tweets.find({'author.screen_name':name}).count()
 
 def tweets_per_day():
-    # prints the average number of tweets per day for each screen name in database
+    """
+    Prints the average number of tweets per day for each screen name in database.
+    """
     for name in screen_names_in_db():
         first_date = db.tweets.find({'author.screen_name':name}).sort('created_at', pymongo.ASCENDING)[0]['created_at']
         diff_days = (datetime.now() - first_date).days
@@ -32,11 +36,16 @@ def tweets_per_day():
         print name, avg, "tweets per day since", first_date
 
 def tweets_with_word(word):
-    # prints the number of tweets containing a given word for each screen name in database
+    """
+    Prints the number of tweets containing a given word or list of words for each screen name in database.
+    """
     for name in screen_names_in_db():
         print name, db.tweets.find({'words': word, 'author.screen_name': name}).count()
 
 def remove_all_tweets():
+    """
+    Removes all tweets from the database. Cannot be undone.
+    """
     confirm = raw_input("this will remove all tweets from your database, are you sure? (y/n): ")
     if confirm != 'y':
         return
@@ -44,11 +53,17 @@ def remove_all_tweets():
     print db.tweets.count(), "total tweets in database"
 
 def print_all_tweets():
+    """
+    Prints the text of all tweets in the database.
+    """
     for name in screen_names_in_db():
         for tweet in db.tweets.find({'author.screen_name': name}):
             print name, tweet['text']
 
 def link_frequency():
+    """
+    For each screen name in the database, prints a list of links in tweets, ordered by number of times tweeted.
+    """
     for name in screen_names_in_db():
         print "LINK FREQUENCY FOR", name
         link_counts = {}
@@ -66,7 +81,13 @@ def link_frequency():
                 print link_count[1], link_count[0]
 
 def word_frequency():
-    boring_words = ['the','to','in','of','and','for','is','on','at','a','be','it','that','with','are','if','its','by']
+    """
+    For each screen name in the database, counts the frequency of words used and prints them in order of frequency.
+
+    By default, the following frequently occurring words are filtered out of this analysis:
+    ['the','to','in','of','and','for','is','on','at','a','be','it','that','this','with','are','if','its','by']
+    """
+    boring_words = ['the','to','in','of','and','for','is','on','at','a','be','it','that','this','with','are','if','its','by']
     for name in screen_names_in_db():
         print "WORD FREQUENCY FOR", name
         word_counts = {}
@@ -84,6 +105,11 @@ def word_frequency():
                 print word_counts[1], word_counts[0]
 
 def export_csv(filename):
+    """
+    Exports a CSV file containing nearly all known data about all tweets in the database.
+
+    Leaves out a few details about entities.
+    """
     # make a new csv file with name of filename
     new_file = open(filename+'.csv','wb')
     # open the file with csv writer

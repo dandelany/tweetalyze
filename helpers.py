@@ -75,6 +75,13 @@ def tweets_with_word(words, print_table=True, export_csv=False, should_return=Fa
 @export_csv
 @print_table
 def entity_frequency(entity_type, min_count=1, print_table=True, export_csv=False, should_return=False):
+    """
+    For each screen name in the database, counts the frequencies of the most commonly tweeted entities by a particular user.
+
+    eg. helpers.entity_frequency('urls')
+    returns the most commonly tweeted urls for each screen name, sorted by frequency of use.
+    Valid entity types are 'user_mentions', 'hashtags', and 'urls'.
+    """
     entity_fields = {'user_mentions': 'screen_name', 'hashtags': 'text', 'urls': 'expanded_url'}
     if entity_type not in entity_fields:
         print "ERROR: Invalid entity type. Valid types are 'user_mentions', 'hashtags', and 'urls'"

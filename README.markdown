@@ -12,9 +12,9 @@ TwitPolitics is a set of Python scripts for scraping tweets from the Twitter tim
 
 # Setup Instructions
 ## Basic Setup
-The dependencies for TwitPolitics are Python 2.6-2.x, MongoDB (2.0.4), and Python libraries pymongo (2.1.1) and tweepy.
+The dependencies for TwitPolitics are Python 2.6-2.x, MongoDB (2.0.4), and Python libraries pymongo (2.1.1), tweepy, decorator and prettytable.
 
-We recommend using Homebrew to install MongoDB and pip to install pymongo and tweepy. Once dependencies are installed, start mongod and run the setup.py script, which will ensure everything is installed correctly by making a test call to the Twitter API, and inserting a tweet in a test collection.
+We recommend using Homebrew to install MongoDB and pip to install pymongo, tweepy, decorator and prettytable. Once dependencies are installed, start mongod and run the setup.py script, which will ensure everything is installed correctly by making a test call to the Twitter API, and inserting a tweet in a test collection.
 
 ## Step-by-step Instructions
 ### Installing MongoDB
@@ -45,18 +45,24 @@ Type "pip --version" and you should now see the version of pip you are running. 
 
     sudo pip install pymongo
     sudo pip install tweepy
+    sudo pip install decorator
+    sudo pip install prettytable
 
 ### Running the setup script
 
 
 # Helpers Module
-### export_csv(filename)
+### all_tweet_data(filename)
     Exports a CSV file containing nearly all known data about all tweets in the database.
-
+    
     Leaves out a few details about entities.
 
-### link_frequency()
-    For each screen name in the database, prints a list of links in tweets, ordered by number of times tweeted.
+### entity_frequency(entity_type, min_count=1, print_table=True, export_csv=False, should_return=False)
+    For each screen name in the database, counts the frequencies of the most commonly tweeted entities by a particular user.
+    
+    eg. helpers.entity_frequency('urls')
+    returns the most commonly tweeted urls for each screen name, sorted by frequency of use.
+    Valid entity types are 'user_mentions', 'hashtags', and 'urls'.
 
 ### print_all_tweets()
     Prints the text of all tweets in the database.
@@ -64,20 +70,20 @@ Type "pip --version" and you should now see the version of pip you are running. 
 ### remove_all_tweets()
     Removes all tweets from the database. Cannot be undone.
 
-### screen_names_in_db()
+### screen_names_in_db(print_table=False, export_csv=False, should_return=True)
     Returns a list of all distinct Twitter screen names in the database.
 
-### total_tweets()
+### total_tweets(print_table=True, export_csv=False, should_return=False)
     Prints the total number of tweets for each screen name in the database.
 
-### tweets_per_day()
+### tweets_per_day(print_table=True, export_csv=False, should_return=False)
     Prints the average number of tweets per day for each screen name in database.
 
-### tweets_with_word(word)
+### tweets_with_word(words, print_table=True, export_csv=False, should_return=False)
     Prints the number of tweets containing a given word or list of words for each screen name in database.
 
-### word_frequency()
+### word_frequency(min_count=10, print_table=True, export_csv=False, should_return=False)
     For each screen name in the database, counts the frequency of words used and prints them in order of frequency.
-
+    
     By default, the following frequently occurring words are filtered out of this analysis:
     ['the','to','in','of','and','for','is','on','at','a','be','it','that','this','with','are','if','its','by']

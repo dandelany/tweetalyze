@@ -52,6 +52,23 @@ Type "pip --version" and you should now see the version of pip you are running. 
 
 
 # Helpers Module
+## Common Keyword Arguments
+Most of the helper functions below share a few common keyword arguments which control their queries and output.
+### print_table
+When True, the function prints a nicely formatted table containing the data requested.
+### export_csv
+When passed a string, the function exports the requested data to a CSV file with the specified filename.
+### should_return
+When True, the function actually returns the requested data rather than just printing or exporting it.
+### Examples
+    # print a table showing the total number of tweets for each screen name
+    total_tweets(print_table=True)
+    # export a csv file called 'tweetsperday' showing tweets per day
+    tweets_per_day(export_csv='tweetsperday')
+    # print a table, export a csv file and return all screen names in database
+    screen_names_in_db(print_table=True, export_csv='names', should_return=True)
+
+## Helper functions
 ### all_tweet_data(filename)
     Exports a CSV file containing nearly all known data about all tweets in the database.
     

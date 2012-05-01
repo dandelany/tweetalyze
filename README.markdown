@@ -70,12 +70,13 @@ When True, the function actually returns the requested data rather than just pri
 When passed a dictionary, extends the MongoDB query with this dictionary to further filter results.
 
 ### Examples
+    import helpers
     # print a table showing the total number of tweets for each screen name sent after 1/1/2012
-    total_tweets(print_table=True, begin_date='1/1/2012')
+    helpers.total_tweets(print_table=True, begin_date='1/1/2012')
     # export a csv file called 'tweetsperday' showing tweets per day
-    tweets_per_day(export_csv='tweetsperday')
+    helpers.tweets_per_day(export_csv='tweetsperday')
     # print a table, export a csv file and return all screen names in database
-    screen_names_in_db(print_table=True, export_csv='names', should_return=True)
+    helpers.screen_names_in_db(print_table=True, export_csv='names', should_return=True)
 
 ## Helper functions
 ### all_tweet_data(filename)

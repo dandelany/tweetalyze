@@ -2,7 +2,7 @@ import pymongo, csv, operator
 from datetime import datetime
 from pprint import pprint
 
-from helper_decorators import export_csv, print_table, should_return
+from helper_decorators import date_range, export_csv, print_table, should_return
 
 connection = False
 db = False
@@ -24,33 +24,41 @@ def screen_names_in_db(print_table=False, export_csv=False, should_return=True):
 @should_return
 @export_csv
 @print_table
-def total_tweets(print_table=True, export_csv=False, should_return=False):
+@date_range
+def total_tweets(begin_date=False, end_date=False, extend_query={}, print_table=True, export_csv=False, should_return=False):
     """
     Prints the total number of tweets for each screen name in the database.
     """
     export_data = [['name', '# of tweets']]
 
     for name in screen_names_in_db():
-        export_data.append([name, db.tweets.find({'author.screen_name':name}).count()])
+        query = dict({'author.screen_name': name}.items() + extend_query.items())
+        export_data.append([name, db.tweets.find(query).count()])
 
-    export_data.append(['TOTAL', db.tweets.count()])
+    export_data.append(['TOTAL', db.tweets.find(extend_query).count()])
     return export_data
 
 @should_return
 @export_csv
 @print_table
-def tweets_per_day(print_table=True, export_csv=False, should_return=False):
+@date_range
+def tweets_per_day(begin_date=False, end_date=False, extend_query={}, print_table=True, export_csv=False, should_return=False):
     """
     Prints the average number of tweets per day for each screen name in database.
     """
     export_data = [['screen name', 'average # tweets per day']]
 
     for name in screen_names_in_db():
-        first_date = db.tweets.find({'author.screen_name':name}).sort('created_at', pymongo.ASCENDING)[0]['created_at']
-        diff_days = (datetime.now() - first_date).days
-        total = db.tweets.find({'author.screen_name':name}).count()
-        avg = float(total) / float(diff_days)
-        export_data.append([name, avg])
+        query = dict({'author.screen_name': name}.items() + extend_query.items())
+        tweets = db.tweets.find(query).sort('created_at', pymongo.ASCENDING)
+        if tweets.count():
+            first_date = tweets[0]['created_at']
+            diff_days = (datetime.now() - first_date).days
+            total = db.tweets.find(query).count()
+            avg = float(total) / float(diff_days)
+            export_data.append([name, avg])
+        else:
+            export_data.append([name, 0])
 
     return export_data
 
@@ -136,23 +144,21 @@ def word_frequency(min_count=10, print_table=True, export_csv=False, should_retu
 
     return export_data
 
-def remove_all_tweets():
-    """
-    Removes all tweets from the database. Cannot be undone.
-    """
-    confirm = raw_input("this will remove all tweets from your database, are you sure? (y/n): ")
-    if confirm != 'y':
-        return
-    db.tweets.remove()
-    print db.tweets.count(), "total tweets in database"
-
-def print_all_tweets():
+@should_return
+@export_csv
+@print_table
+@date_range
+def tweets_text(begin_date=False, end_date=False, extend_query={}, print_table=True, export_csv=False, should_return=False):
     """
     Prints the text of all tweets in the database.
     """
+    export_data = [['screen_name', 'date sent', 'tweet text']]
     for name in screen_names_in_db():
-        for tweet in db.tweets.find({'author.screen_name': name}):
-            print name, tweet['text']
+        query = dict({'author.screen_name': name}.items() + extend_query.items())
+        for tweet in db.tweets.find(query):
+            tweet_text = unicode(tweet['text']).encode('ascii','ignore')
+            export_data.append([name, tweet['created_at'], tweet_text])
+    return export_data
 
 def all_tweet_data(filename):
     """
@@ -209,3 +215,12 @@ def _recursive_list(data, list_so_far, keys_to_ignore, is_key_list):
 
     return list_so_far
 
+def remove_all_tweets():
+    """
+    Removes all tweets from the database. Cannot be undone.
+    """
+    confirm = raw_input("this will remove all tweets from your database, are you sure? (y/n): ")
+    if confirm != 'y':
+        return
+    db.tweets.remove()
+    print db.tweets.count(), "total tweets in database"

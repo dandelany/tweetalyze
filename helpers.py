@@ -65,7 +65,8 @@ def tweets_per_day(begin_date=False, end_date=False, extend_query={}, print_tabl
 @should_return
 @export_csv
 @print_table
-def tweets_with_word(words, print_table=True, export_csv=False, should_return=False):
+@date_range
+def tweets_with_word(words, begin_date=False, end_date=False, extend_query={}, print_table=True, export_csv=False, should_return=False):
     """
     Prints the number of tweets containing a given word or list of words for each screen name in database.
     """
@@ -74,7 +75,8 @@ def tweets_with_word(words, print_table=True, export_csv=False, should_return=Fa
     export_data = [['screen name', '# of tweets containing ' + words_string]]
 
     for name in screen_names_in_db():
-        tweet_count = db.tweets.find({'words': {'$in': words}, 'author.screen_name': name}).count()
+        query = dict({'words': {'$in': words}, 'author.screen_name': name}.items() + extend_query.items())
+        tweet_count = db.tweets.find(query).count()
         export_data.append([name, tweet_count])
 
     return export_data
@@ -82,7 +84,8 @@ def tweets_with_word(words, print_table=True, export_csv=False, should_return=Fa
 @should_return
 @export_csv
 @print_table
-def entity_frequency(entity_type, min_count=1, print_table=True, export_csv=False, should_return=False):
+@date_range
+def entity_frequency(entity_type, min_count=1, begin_date=False, end_date=False, extend_query={}, print_table=True, export_csv=False, should_return=False):
     """
     For each screen name in the database, counts the frequencies of the most commonly tweeted entities by a particular user.
 
@@ -98,7 +101,8 @@ def entity_frequency(entity_type, min_count=1, print_table=True, export_csv=Fals
 
     for name in screen_names_in_db():
         entity_counts = {}
-        for tweet in db.tweets.find({'author.screen_name':name}):
+        query = dict({'author.screen_name':name}.items() + extend_query.items())
+        for tweet in db.tweets.find(query):
             for entity in tweet['entities'][entity_type]:
                 entity_string = entity[entity_fields[entity_type]].lower()
                 if entity_string in entity_counts:
@@ -116,7 +120,8 @@ def entity_frequency(entity_type, min_count=1, print_table=True, export_csv=Fals
 @should_return
 @export_csv
 @print_table
-def word_frequency(min_count=10, print_table=True, export_csv=False, should_return=False):
+@date_range
+def word_frequency(min_count=10, begin_date=False, end_date=False, extend_query={}, print_table=True, export_csv=False, should_return=False):
     """
     For each screen name in the database, counts the frequency of words used and prints them in order of frequency.
 
@@ -128,8 +133,9 @@ def word_frequency(min_count=10, print_table=True, export_csv=False, should_retu
 
     for name in screen_names_in_db():
         word_counts = {}
-        total_tweets = db.tweets.find({'author.screen_name':name}).count()
-        for tweet in db.tweets.find({'author.screen_name':name}):
+        query = dict({'author.screen_name':name}.items() + extend_query.items())
+        total_tweets = db.tweets.find(query).count()
+        for tweet in db.tweets.find(query):
             for word in tweet['words']:
                 if word in filtered_words: continue
                 if word in word_counts:

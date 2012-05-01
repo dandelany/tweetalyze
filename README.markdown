@@ -56,15 +56,22 @@ Type "pip --version" and you should now see the version of pip you are running. 
 # Helpers Module
 ## Common Keyword Arguments
 Most of the helper functions below share a few common keyword arguments which control their queries and output.
+### begin_date
+When passed a datetime or date string in the format 'mm/dd/yyyy', filters out tweets sent before the specified date
+### end_date
+When passed a datetime or date string in the format 'mm/dd/yyyy', filters out tweets sent after the specified date
 ### print_table
 When True, the function prints a nicely formatted table containing the data requested.
 ### export_csv
 When passed a string, the function exports the requested data to a CSV file with the specified filename.
 ### should_return
 When True, the function actually returns the requested data rather than just printing or exporting it.
+### extend_query
+When passed a dictionary, extends the MongoDB query with this dictionary to further filter results.
+
 ### Examples
-    # print a table showing the total number of tweets for each screen name
-    total_tweets(print_table=True)
+    # print a table showing the total number of tweets for each screen name sent after 1/1/2012
+    total_tweets(print_table=True, begin_date='1/1/2012')
     # export a csv file called 'tweetsperday' showing tweets per day
     tweets_per_day(export_csv='tweetsperday')
     # print a table, export a csv file and return all screen names in database
@@ -76,15 +83,12 @@ When True, the function actually returns the requested data rather than just pri
     
     Leaves out a few details about entities.
 
-### entity_frequency(entity_type, min_count=1, print_table=True, export_csv=False, should_return=False)
+### entity_frequency(entity_type, min_count=1, begin_date=False, end_date=False, extend_query={}, print_table=True, export_csv=False, should_return=False)
     For each screen name in the database, counts the frequencies of the most commonly tweeted entities by a particular user.
     
     eg. helpers.entity_frequency('urls')
     returns the most commonly tweeted urls for each screen name, sorted by frequency of use.
     Valid entity types are 'user_mentions', 'hashtags', and 'urls'.
-
-### print_all_tweets()
-    Prints the text of all tweets in the database.
 
 ### remove_all_tweets()
     Removes all tweets from the database. Cannot be undone.
@@ -92,16 +96,19 @@ When True, the function actually returns the requested data rather than just pri
 ### screen_names_in_db(print_table=False, export_csv=False, should_return=True)
     Returns a list of all distinct Twitter screen names in the database.
 
-### total_tweets(print_table=True, export_csv=False, should_return=False)
+### total_tweets(begin_date=False, end_date=False, extend_query={}, print_table=True, export_csv=False, should_return=False)
     Prints the total number of tweets for each screen name in the database.
 
-### tweets_per_day(print_table=True, export_csv=False, should_return=False)
+### tweets_per_day(begin_date=False, end_date=False, extend_query={}, print_table=True, export_csv=False, should_return=False)
     Prints the average number of tweets per day for each screen name in database.
 
-### tweets_with_word(words, print_table=True, export_csv=False, should_return=False)
+### tweets_text(begin_date=False, end_date=False, extend_query={}, print_table=True, export_csv=False, should_return=False)
+    Prints the text of all tweets in the database.
+
+### tweets_with_word(words, begin_date=False, end_date=False, extend_query={}, print_table=True, export_csv=False, should_return=False)
     Prints the number of tweets containing a given word or list of words for each screen name in database.
 
-### word_frequency(min_count=10, print_table=True, export_csv=False, should_return=False)
+### word_frequency(min_count=10, begin_date=False, end_date=False, extend_query={}, print_table=True, export_csv=False, should_return=False)
     For each screen name in the database, counts the frequency of words used and prints them in order of frequency.
     
     By default, the following frequently occurring words are filtered out of this analysis:

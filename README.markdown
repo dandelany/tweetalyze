@@ -5,7 +5,8 @@ Dan Delany, Michelle Forelle, Sarah Sullivan
 2. [Setup Instructions](#setup-instructions)
     * [Basic Setup](#basic-setup)
     * [Step-by-step Instructions](#step-by-step-instructions)
-3. [Helpers Module](#helpers-module)
+3. [Scraper Script](#scraper-script)
+4. [Helpers Module](#helpers-module)
     * [Common Keyword Arguments](#common-keyword-arguments)
     * [Helper Functions](#helper-functions)
 
@@ -52,6 +53,7 @@ Type "pip --version" and you should now see the version of pip you are running. 
 
 ### Running the setup script
 
+# Scraper Script
 
 # Helpers Module
 ## Common Keyword Arguments
